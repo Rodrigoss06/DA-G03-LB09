@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model archivo {
+  id_archivo      Int               @id @default(autoincrement())
+  nombre_archivo  String            @db.VarChar(255)
+  ruta_archivo    String            @db.VarChar(500)
+  fecha_subida    DateTime?         @default(now()) @db.Timestamp(6)
+  id_especialidad Int?
+  especialidad    especialidad?     @relation(fields: [id_especialidad], references: [id_especialidad], onDelete: Cascade, onUpdate: NoAction)
+  archivo_usuario archivo_usuario[]
+}
+
+model archivo_usuario {
+  id_usuario Int
+  id_archivo Int
+  archivo    archivo @relation(fields: [id_archivo], references: [id_archivo], onDelete: Cascade, onUpdate: NoAction)
+  usuario    usuario @relation(fields: [id_usuario], references: [id_usuario], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([id_usuario, id_archivo])
+}
+
+model especialidad {
+  id_especialidad     Int       @id @default(autoincrement())
+  nombre_especialidad String    @unique @db.VarChar(100)
+  archivo             archivo[]
+}
+
+model usuario {
+  id_usuario         Int               @id @default(autoincrement())
+  nombre_usuario     String            @db.VarChar(100)
+  email_usuario      String            @unique @db.VarChar(100)
+  contrasena_usuario String            @db.VarChar(100)
+  archivo_usuario    archivo_usuario[]
+}
